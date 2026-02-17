@@ -49,7 +49,7 @@ export default function FileManager() {
               <button
                 key={node.path}
                 className="flex items-center gap-3 w-full px-3 py-2 rounded-md hover:bg-neutral-800 transition-colors text-left"
-                onDoubleClick={() => handleOpen(node)}
+                onClick={() => handleOpen(node)}
               >
                 <span className="text-lg">{getFileIcon(node)}</span>
                 <div className="flex-1 min-w-0">

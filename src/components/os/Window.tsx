@@ -6,6 +6,7 @@ import { useWindowStore, type WindowState } from "@/stores/windowStore";
 import { useLocaleStore } from "@/stores/localeStore";
 import { useWindowDrag } from "@/hooks/useWindowDrag";
 import { useWindowResize } from "@/hooks/useWindowResize";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface WindowProps {
   window: WindowState;
@@ -34,6 +35,7 @@ export default function Window({ window: win, children }: WindowProps) {
     useWindowStore();
   const t = useLocaleStore((s) => s.t);
 
+  const isMobile = useIsMobile();
   const isActive = activeWindowId === win.id;
   const displayTitle = win.titleKey ? t(win.titleKey) : win.title;
 
@@ -59,17 +61,19 @@ export default function Window({ window: win, children }: WindowProps) {
               : "border-white/8 shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
           }`}
           animate={
-            win.isMaximized
-              ? { top: 0, left: 0, width: "100%", height: "calc(100vh - 48px)", borderRadius: 0, opacity: 1, scale: 1 }
-              : {
-                  top: win.position.y,
-                  left: win.position.x,
-                  width: win.size.width,
-                  height: win.size.height,
-                  borderRadius: 12,
-                  opacity: 1,
-                  scale: 1,
-                }
+            isMobile
+              ? { top: 0, left: 0, width: "100%", height: "calc(100dvh - 48px)", borderRadius: 0, opacity: 1, scale: 1 }
+              : win.isMaximized
+                ? { top: 0, left: 0, width: "100%", height: "calc(100vh - 48px)", borderRadius: 0, opacity: 1, scale: 1 }
+                : {
+                    top: win.position.y,
+                    left: win.position.x,
+                    width: win.size.width,
+                    height: win.size.height,
+                    borderRadius: 12,
+                    opacity: 1,
+                    scale: 1,
+                  }
           }
           style={{ zIndex: win.zIndex }}
           initial={{ opacity: 0, scale: 0.95 }}
@@ -84,8 +88,8 @@ export default function Window({ window: win, children }: WindowProps) {
                 ? "bg-neutral-800/95 text-white"
                 : "bg-neutral-900/95 text-neutral-500"
             }`}
-            {...dragHandlers}
-            onDoubleClick={() =>
+            {...(isMobile ? {} : dragHandlers)}
+            onDoubleClick={isMobile ? undefined : () =>
               win.isMaximized ? restoreWindow(win.id) : maximizeWindow(win.id)
             }
           >
@@ -94,22 +98,26 @@ export default function Window({ window: win, children }: WindowProps) {
             </span>
 
             <div className="flex items-center gap-1.5 ml-4" onPointerDown={(e) => e.stopPropagation()}>
+              {!isMobile && (
+                <button
+                  className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 hover:scale-110 transition-all"
+                  onClick={() => minimizeWindow(win.id)}
+                  aria-label={t("system.minimize")}
+                  title={t("system.minimize")}
+                />
+              )}
+              {!isMobile && (
+                <button
+                  className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 hover:scale-110 transition-all"
+                  onClick={() =>
+                    win.isMaximized ? restoreWindow(win.id) : maximizeWindow(win.id)
+                  }
+                  aria-label={win.isMaximized ? t("system.restore") : t("system.maximize")}
+                  title={win.isMaximized ? t("system.restore") : t("system.maximize")}
+                />
+              )}
               <button
-                className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 hover:scale-110 transition-all"
-                onClick={() => minimizeWindow(win.id)}
-                aria-label={t("system.minimize")}
-                title={t("system.minimize")}
-              />
-              <button
-                className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 hover:scale-110 transition-all"
-                onClick={() =>
-                  win.isMaximized ? restoreWindow(win.id) : maximizeWindow(win.id)
-                }
-                aria-label={win.isMaximized ? t("system.restore") : t("system.maximize")}
-                title={win.isMaximized ? t("system.restore") : t("system.maximize")}
-              />
-              <button
-                className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 hover:scale-110 transition-all"
+                className={`${isMobile ? "w-5 h-5" : "w-3 h-3"} rounded-full bg-red-500 hover:bg-red-400 hover:scale-110 transition-all`}
                 onClick={() => closeWindow(win.id)}
                 aria-label={t("system.close")}
                 title={t("system.close")}
@@ -123,7 +131,7 @@ export default function Window({ window: win, children }: WindowProps) {
           </div>
 
           {/* Resize handles */}
-          {!win.isMaximized &&
+          {!isMobile && !win.isMaximized &&
             resizeHandles.map(({ dir, className, isCorner }) => (
               <div
                 key={dir}

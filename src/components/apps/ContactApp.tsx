@@ -8,7 +8,7 @@ export default function ContactApp() {
   const t = useLocaleStore((s) => s.t);
 
   return (
-    <div className="h-full flex flex-col p-6 gap-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-4 sm:p-6 gap-5 overflow-y-auto">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-xl font-bold text-white">{t("contact.title")}</h2>
@@ -65,7 +65,7 @@ export default function ContactApp() {
         <p className="text-neutral-500 text-xs uppercase tracking-wider mb-2">
           {t("contact.downloadCv")}
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2">
           <a
             href={profile.cvs.en}
             download

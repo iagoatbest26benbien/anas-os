@@ -32,14 +32,14 @@ export default function BrowserApp({
         {/* Navigation buttons */}
         <div className="flex items-center gap-0.5">
           <button
-            className="px-1.5 py-1 rounded hover:bg-neutral-800 text-neutral-500 text-sm transition-colors cursor-not-allowed"
+            className="hidden sm:block px-1.5 py-1 rounded hover:bg-neutral-800 text-neutral-500 text-sm transition-colors cursor-not-allowed"
             aria-label="Back"
             disabled
           >
             ←
           </button>
           <button
-            className="px-1.5 py-1 rounded hover:bg-neutral-800 text-neutral-500 text-sm transition-colors cursor-not-allowed"
+            className="hidden sm:block px-1.5 py-1 rounded hover:bg-neutral-800 text-neutral-500 text-sm transition-colors cursor-not-allowed"
             aria-label="Forward"
             disabled
           >
@@ -54,7 +54,7 @@ export default function BrowserApp({
           </button>
         </div>
         <button
-          className="px-2 py-1 rounded hover:bg-neutral-800 text-neutral-400 hover:text-white text-sm transition-colors"
+          className="hidden sm:block px-2 py-1 rounded hover:bg-neutral-800 text-neutral-400 hover:text-white text-sm transition-colors"
           onClick={() => {
             setUrl("about:blank");
             setInputUrl("about:blank");
@@ -68,7 +68,7 @@ export default function BrowserApp({
             type="text"
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
-            className="flex-1 bg-neutral-800 rounded-md px-3 py-1.5 text-sm text-white placeholder:text-neutral-500 outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+            className="flex-1 bg-neutral-800 rounded-md px-3 py-1.5 text-xs sm:text-sm text-white placeholder:text-neutral-500 outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             placeholder={t("browser.placeholder")}
           />
         </form>

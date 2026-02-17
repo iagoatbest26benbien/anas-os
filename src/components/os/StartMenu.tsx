@@ -6,6 +6,7 @@ import { getStartMenuApps } from "@/lib/appRegistry";
 import { useWindowStore } from "@/stores/windowStore";
 import { useLocaleStore } from "@/stores/localeStore";
 import { useSettingsStore, wallpapers } from "@/stores/settingsStore";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface StartMenuProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface StartMenuProps {
 }
 
 export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
+  const isMobile = useIsMobile();
   const openWindow = useWindowStore((s) => s.openWindow);
   const t = useLocaleStore((s) => s.t);
   const apps = getStartMenuApps();
@@ -31,7 +33,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
           <div className="fixed inset-0 z-[9998]" onClick={onClose} />
 
           <motion.div
-            className="absolute bottom-14 left-2 w-80 bg-neutral-900/95 backdrop-blur-2xl rounded-xl border border-white/10 shadow-[0_8px_50px_rgba(0,0,0,0.6)] z-[9999] overflow-hidden"
+            className={`absolute bottom-14 left-2 ${isMobile ? "w-[calc(100vw-16px)]" : "w-80"} bg-neutral-900/95 backdrop-blur-2xl rounded-xl border border-white/10 shadow-[0_8px_50px_rgba(0,0,0,0.6)] z-[9999] overflow-hidden`}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -88,7 +90,7 @@ export default function StartMenu({ isOpen, onClose }: StartMenuProps) {
                   transition={{ duration: 0.25 }}
                 >
                   {/* Apps grid */}
-                  <div className="p-3 grid grid-cols-3 gap-1">
+                  <div className={`p-3 grid ${isMobile ? "grid-cols-4" : "grid-cols-3"} gap-1`}>
                     {apps.map((app) => (
                       <button
                         key={app.id}

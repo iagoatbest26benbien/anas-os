@@ -6,6 +6,7 @@ import { useWindowStore } from "@/stores/windowStore";
 import { useLocaleStore } from "@/stores/localeStore";
 import { useSettingsStore, wallpapers } from "@/stores/settingsStore";
 import { getDesktopApps, type AppDefinition } from "@/lib/appRegistry";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import DesktopIcon from "./DesktopIcon";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
@@ -60,6 +61,7 @@ export default function Desktop() {
   const openWindow = useWindowStore((s) => s.openWindow);
   const t = useLocaleStore((s) => s.t);
   const wallpaper = useSettingsStore((s) => s.getWallpaper());
+  const isMobile = useIsMobile();
   const allDesktopApps = getDesktopApps();
 
   // Prevent hydration mismatch
@@ -209,7 +211,7 @@ export default function Desktop() {
 
   return (
     <div
-      className="relative w-screen h-screen overflow-hidden"
+      className="relative w-screen h-[100dvh] overflow-hidden"
       style={{ backgroundColor: "#0a0a1a" }}
       onContextMenu={handleDesktopContextMenu}
     >
@@ -226,9 +228,13 @@ export default function Desktop() {
         />
       </AnimatePresence>
 
-      {/* Desktop icons — vertical column layout, top to bottom then next column */}
+      {/* Desktop icons — vertical column layout on desktop, grid on mobile */}
       <motion.div
-        className="absolute inset-0 bottom-12 p-4 flex flex-col flex-wrap gap-2 content-start items-start"
+        className={`absolute inset-0 bottom-12 ${
+          isMobile
+            ? "grid grid-cols-4 gap-1 p-3 content-start"
+            : "p-4 flex flex-col flex-wrap gap-2 content-start items-start"
+        }`}
         initial={mounted ? "hidden" : "visible"}
         animate="visible"
         variants={{
@@ -251,6 +257,7 @@ export default function Desktop() {
               onDoubleClick={() => openWindow(app.id)}
               onContextMenu={(e) => handleIconContextMenu(e, app)}
               isRenaming={renamingIconId === app.id}
+              isMobile={isMobile}
               onRename={(newName) => {
                 if (newName.trim()) {
                   setCustomNames((prev) => ({ ...prev, [app.id]: newName.trim() }));
@@ -290,7 +297,11 @@ export default function Desktop() {
 
       {/* Hire Me CTA */}
       <motion.button
-        className="absolute bottom-16 right-4 z-[9000] flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full shadow-lg shadow-blue-500/25 font-medium text-sm"
+        className={`absolute z-[9000] flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full shadow-lg shadow-blue-500/25 font-medium ${
+          isMobile
+            ? "bottom-14 right-2 text-xs px-3 py-2"
+            : "bottom-16 right-4 text-sm px-4 py-2.5"
+        }`}
         onClick={() => openWindow("contact")}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}

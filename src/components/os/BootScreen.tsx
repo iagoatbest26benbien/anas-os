@@ -95,7 +95,8 @@ export default function BootScreen({ onBootComplete }: BootScreenProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 150, damping: 15 }}
           >
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div className="w-16 h-16 sm:w-20 sm:h-20">
+            <svg width="100%" height="100%" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="40" cy="40" r="38" stroke="url(#bootGrad)" strokeWidth="2" opacity="0.4" />
               <text x="40" y="50" textAnchor="middle" fontFamily="system-ui, sans-serif" fontSize="36" fontWeight="700" fill="url(#bootGrad)">A</text>
               <defs>
@@ -105,11 +106,12 @@ export default function BootScreen({ onBootComplete }: BootScreenProps) {
                 </linearGradient>
               </defs>
             </svg>
+            </div>
             <div className="absolute inset-0 blur-3xl opacity-30 bg-blue-500 rounded-full scale-150" />
           </motion.div>
 
           <motion.h1
-            className="text-4xl font-bold text-white tracking-widest"
+            className="text-2xl sm:text-4xl font-bold text-white tracking-widest"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -119,7 +121,7 @@ export default function BootScreen({ onBootComplete }: BootScreenProps) {
 
           {/* Progress bar */}
           <motion.div
-            className="w-72"
+            className="w-56 sm:w-72"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -135,7 +137,7 @@ export default function BootScreen({ onBootComplete }: BootScreenProps) {
           {/* Boot message */}
           <motion.p
             key={messageIndex}
-            className="text-sm text-neutral-500 font-mono"
+            className="text-xs sm:text-sm text-neutral-500 font-mono"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}

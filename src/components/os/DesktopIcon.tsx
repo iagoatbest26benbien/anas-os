@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
 interface DesktopIconProps {
@@ -11,6 +11,7 @@ interface DesktopIconProps {
   isRenaming?: boolean;
   onRename?: (newName: string) => void;
   onCancelRename?: () => void;
+  isMobile?: boolean;
 }
 
 export default function DesktopIcon({
@@ -21,10 +22,12 @@ export default function DesktopIcon({
   isRenaming,
   onRename,
   onCancelRename,
+  isMobile,
 }: DesktopIconProps) {
   const [isSelected, setIsSelected] = useState(false);
   const [renameValue, setRenameValue] = useState(label);
   const inputRef = useRef<HTMLInputElement>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Focus input when entering rename mode
   useEffect(() => {
@@ -52,20 +55,74 @@ export default function DesktopIcon({
     }
   };
 
+  // Long press handlers for mobile context menu
+  const clearLongPress = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isMobile || !onContextMenu) return;
+      const touch = e.touches[0];
+      const clientX = touch.clientX;
+      const clientY = touch.clientY;
+      longPressTimer.current = setTimeout(() => {
+        longPressTimer.current = null;
+        // Create a synthetic MouseEvent-like object for onContextMenu
+        const fakeEvent = {
+          clientX,
+          clientY,
+          preventDefault: () => {},
+          stopPropagation: () => {},
+        } as unknown as React.MouseEvent;
+        setIsSelected(true);
+        onContextMenu(fakeEvent);
+      }, 500);
+    },
+    [isMobile, onContextMenu]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    clearLongPress();
+  }, [clearLongPress]);
+
+  const handleTouchMove = useCallback(() => {
+    clearLongPress();
+  }, [clearLongPress]);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => clearLongPress();
+  }, [clearLongPress]);
+
   return (
     <motion.button
-      className={`flex flex-col items-center justify-center gap-2 w-24 h-[104px] rounded-xl p-2 cursor-default select-none transition-colors ${
+      className={`flex flex-col items-center justify-center gap-2 ${
+        isMobile ? "w-20 h-[88px]" : "w-24 h-[104px]"
+      } rounded-xl p-2 cursor-default select-none transition-colors ${
         isSelected || isRenaming
           ? "bg-white/15 ring-1 ring-blue-400/40"
           : "hover:bg-white/8"
       }`}
-      onClick={() => setIsSelected(true)}
-      onDoubleClick={isRenaming ? undefined : onDoubleClick}
+      onClick={() => {
+        if (isMobile && !isRenaming) {
+          onDoubleClick();
+        } else {
+          setIsSelected(true);
+        }
+      }}
+      onDoubleClick={isMobile ? undefined : isRenaming ? undefined : onDoubleClick}
       onContextMenu={(e) => {
         e.preventDefault();
         setIsSelected(true);
         onContextMenu?.(e);
       }}
+      onTouchStart={isMobile ? handleTouchStart : undefined}
+      onTouchEnd={isMobile ? handleTouchEnd : undefined}
+      onTouchMove={isMobile ? handleTouchMove : undefined}
       onKeyDown={(e) => {
         if (!isRenaming && (e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
@@ -79,12 +136,12 @@ export default function DesktopIcon({
           if (isRenaming) onCancelRename?.();
         }
       }}
-      whileHover={isRenaming ? undefined : { scale: 1.05 }}
-      whileTap={isRenaming ? undefined : { scale: 0.95 }}
+      whileHover={isRenaming || isMobile ? undefined : { scale: 1.05 }}
+      whileTap={isRenaming || isMobile ? undefined : { scale: 0.95 }}
       aria-label={label}
       tabIndex={0}
     >
-      <span className="text-4xl drop-shadow-lg" aria-hidden="true">{icon}</span>
+      <span className={`${isMobile ? "text-3xl" : "text-4xl"} drop-shadow-lg`} aria-hidden="true">{icon}</span>
       {isRenaming ? (
         <input
           ref={inputRef}
@@ -98,7 +155,7 @@ export default function DesktopIcon({
           maxLength={30}
         />
       ) : (
-        <span className="text-xs text-white/90 text-center leading-tight line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] font-medium">
+        <span className={`${isMobile ? "text-[11px]" : "text-xs"} text-white/90 text-center leading-tight line-clamp-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] font-medium`}>
           {label}
         </span>
       )}

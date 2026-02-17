@@ -28,10 +28,10 @@ export default function AboutApp() {
   }, [bio]);
 
   return (
-    <div className="h-full flex flex-col p-6 gap-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-4 sm:p-6 gap-5 overflow-y-auto">
       {/* Header */}
-      <div className="flex items-start gap-5">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shrink-0 shadow-lg">
+      <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-5">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shrink-0 shadow-lg">
           {profile.initials}
         </div>
         <div className="flex-1 min-w-0">

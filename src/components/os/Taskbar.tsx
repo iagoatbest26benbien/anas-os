@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 import { useWindowStore } from "@/stores/windowStore";
 import { useLocaleStore } from "@/stores/localeStore";
 import { getApp } from "@/lib/appRegistry";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import StartMenu from "./StartMenu";
 
 export default function Taskbar() {
+  const isMobile = useIsMobile();
   const windows = useWindowStore((s) => s.windows);
   const activeWindowId = useWindowStore((s) => s.activeWindowId);
   const focusWindow = useWindowStore((s) => s.focusWindow);
@@ -89,7 +91,7 @@ export default function Taskbar() {
                 onClick={() => handleTaskbarClick(win.id, win.isMinimized)}
               >
                 <span aria-hidden="true">{app?.icon || "📱"}</span>
-                <span className="truncate max-w-[120px]">{label}</span>
+                {!isMobile && <span className="truncate max-w-[120px]">{label}</span>}
                 {isActive && (
                   <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-blue-400 rounded-full" />
                 )}
@@ -99,12 +101,14 @@ export default function Taskbar() {
         </div>
 
         {/* Availability indicator */}
-        <div className="flex items-center gap-1.5 mr-3">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-[10px] text-green-400/80 font-medium hidden sm:inline">
-            {t("cta.hireSubtitle")}
-          </span>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-1.5 mr-3">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-[10px] text-green-400/80 font-medium hidden sm:inline">
+              {t("cta.hireSubtitle")}
+            </span>
+          </div>
+        )}
 
         {/* Language toggle */}
         <button
@@ -116,16 +120,18 @@ export default function Taskbar() {
         </button>
 
         {/* System tray */}
-        <div className="flex items-center gap-3 text-neutral-400 text-xs mr-2">
-          <span title="Volume" aria-hidden="true">🔊</span>
-          <span title="Wi-Fi" aria-hidden="true">📶</span>
-          <span title="Battery" aria-hidden="true">🔋</span>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-3 text-neutral-400 text-xs mr-2">
+            <span title="Volume" aria-hidden="true">🔊</span>
+            <span title="Wi-Fi" aria-hidden="true">📶</span>
+            <span title="Battery" aria-hidden="true">🔋</span>
+          </div>
+        )}
 
         {/* Clock & Date */}
         <div className="text-right min-w-[56px]">
           <div className="text-sm text-neutral-300 font-medium leading-tight">{time}</div>
-          <div className="text-[10px] text-neutral-500 leading-tight">{date}</div>
+          {!isMobile && <div className="text-[10px] text-neutral-500 leading-tight">{date}</div>}
         </div>
       </div>
     </>

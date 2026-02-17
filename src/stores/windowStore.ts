@@ -59,6 +59,8 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
     const id = `window-${++windowCounter}`;
     const offset = (windows.length % 8) * 30;
 
+    const isMobileView = typeof window !== "undefined" && window.innerWidth <= 768;
+
     const newWindow: WindowState = {
       id,
       appId,
@@ -68,7 +70,7 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
       size: overrides?.size || app?.defaultSize || { width: 700, height: 500 },
       minSize: app?.minSize || { width: 400, height: 300 },
       isMinimized: false,
-      isMaximized: false,
+      isMaximized: isMobileView ? true : false,
       zIndex: nextZIndex,
     };
 
